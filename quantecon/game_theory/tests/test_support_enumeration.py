@@ -25,7 +25,7 @@ def random_skew_sym(n, m=None, random_state=None):
     A[n:, n:] = 0
     A[:n, n:] = B
     A[n:, :n] = -B.T
-    return NormalFormGame([Player(A) for i in range(2)])
+    return NormalFormGame([Player(A) for _ in range(2)])
 
 
 class TestSupportEnumeration():

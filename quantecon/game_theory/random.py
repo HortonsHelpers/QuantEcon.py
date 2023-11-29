@@ -50,8 +50,7 @@ def random_game(nums_actions, random_state=None):
         Player(random_state.random(nums_actions[i:]+nums_actions[:i]))
         for i in range(N)
     ]
-    g = NormalFormGame(players)
-    return g
+    return NormalFormGame(players)
 
 
 def covariance_game(nums_actions, rho, random_state=None):
@@ -112,8 +111,7 @@ def covariance_game(nums_actions, rho, random_state=None):
     random_state = check_random_state(random_state)
     payoff_profile_array = \
         random_state.multivariate_normal(mean, cov, nums_actions)
-    g = NormalFormGame(payoff_profile_array)
-    return g
+    return NormalFormGame(payoff_profile_array)
 
 
 def random_pure_actions(nums_actions, random_state=None):
@@ -138,10 +136,9 @@ def random_pure_actions(nums_actions, random_state=None):
 
     """
     random_state = check_random_state(random_state)
-    action_profile = tuple(
-        [rng_integers(random_state, num_actions) for num_actions in nums_actions]
+    return tuple(
+        rng_integers(random_state, num_actions) for num_actions in nums_actions
     )
-    return action_profile
 
 
 def _random_mixed_actions(out, random_state):

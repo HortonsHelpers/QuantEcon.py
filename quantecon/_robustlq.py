@@ -69,7 +69,7 @@ class RBLQ:
         # == Remaining parameters == #
         self.beta, self.theta = beta, theta
         # == Check for case of no control (pure forecasting problem) == #
-        self.pure_forecasting = True if not Q.any() and not B.any() else False
+        self.pure_forecasting = not Q.any() and not B.any()
 
     def __repr__(self):
         return self.__str__()
@@ -110,9 +110,7 @@ class RBLQ:
         S1 = np.dot(P, C)
         S2 = np.dot(C.T, S1)
 
-        dP = P + np.dot(S1, solve(theta * I - S2, S1.T))
-
-        return dP
+        return P + np.dot(S1, solve(theta * I - S2, S1.T))
 
     def b_operator(self, P):
         r"""
@@ -351,9 +349,7 @@ class RBLQ:
         H0 = np.dot(K.T, K)
         C0 = np.zeros((self.n, 1))
         A0 = self.A - np.dot(self.B, F) + np.dot(self.C, K)
-        e = var_quadratic_sum(A0, C0, H0, self.beta, x0)
-
-        return e
+        return var_quadratic_sum(A0, C0, H0, self.beta, x0)
 
     def evaluate_F(self, F):
         """

@@ -158,15 +158,9 @@ def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500,
     A, B, Q, R = np.atleast_2d(A, B, Q, R)
     n, k = R.shape[0], Q.shape[0]
     I = np.identity(k)
-    if N is None:
-        N = np.zeros((n, k))
-    else:
-        N = np.atleast_2d(N)
-
+    N = np.zeros((n, k)) if N is None else np.atleast_2d(N)
     if method == 'qz':
-        X = sp_solve_discrete_are(A, B, Q, R, s=N.T)
-        return X
-
+        return sp_solve_discrete_are(A, B, Q, R, s=N.T)
     # if method == 'doubling'
     # == Choose optimal value of gamma in R_hat = R + gamma B'B == #
     current_min = np.inf
@@ -210,16 +204,15 @@ def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500,
         if i > max_iter:
             raise ValueError(fail_msg.format(i))
 
-        else:
-            A1 = np.dot(A0, solve(I + np.dot(G0, H0), A0))
-            G1 = G0 + np.dot(np.dot(A0, G0), solve(I + np.dot(H0, G0), A0.T))
-            H1 = H0 + np.dot(A0.T, solve(I + np.dot(H0, G0), np.dot(H0, A0)))
+        A1 = np.dot(A0, solve(I + np.dot(G0, H0), A0))
+        G1 = G0 + np.dot(np.dot(A0, G0), solve(I + np.dot(H0, G0), A0.T))
+        H1 = H0 + np.dot(A0.T, solve(I + np.dot(H0, G0), np.dot(H0, A0)))
 
-            error = np.max(np.abs(H1 - H0))
-            A0 = A1
-            G0 = G1
-            H0 = H1
-            i += 1
+        error = np.max(np.abs(H1 - H0))
+        A0 = A1
+        G0 = G1
+        H0 = H1
+        i += 1
 
     return H1 + gamma * I  # Return X
 
@@ -273,7 +266,7 @@ def solve_discrete_riccati_system(Π, As, Bs, Cs, Qs, Rs, Ns, beta,
     m = Qs.shape[0]
     k, n = Qs.shape[1], Rs.shape[1]
     # Create the Ps matrices, initialize as identity matrix
-    Ps = np.array([np.eye(n) for i in range(m)])
+    Ps = np.array([np.eye(n) for _ in range(m)])
     Ps1 = np.copy(Ps)
 
     # == Set up for iteration on Riccati equations system == #
@@ -290,23 +283,22 @@ def solve_discrete_riccati_system(Π, As, Bs, Cs, Qs, Rs, Ns, beta,
         if iteration > max_iter:
             raise ValueError(fail_msg.format(max_iter))
 
-        else:
-            error = 0
-            for i in range(m):
-                # Initialize arrays
-                sum1[:, :] = 0.
-                sum2[:, :] = 0.
-                for j in range(m):
-                    sum1 += beta * Π[i, j] * As[i].T @ Ps[j] @ As[i]
-                    sum2 += Π[i, j] * \
-                            (beta * As[i].T @ Ps[j] @ Bs[i] + Ns[i].T) @ \
-                            solve(Qs[i] + beta * Bs[i].T @ Ps[j] @ Bs[i],
-                                  beta * Bs[i].T @ Ps[j] @ As[i] + Ns[i])
+        error = 0
+        for i in range(m):
+            # Initialize arrays
+            sum1[:, :] = 0.
+            sum2[:, :] = 0.
+            for j in range(m):
+                sum1 += beta * Π[i, j] * As[i].T @ Ps[j] @ As[i]
+                sum2 += Π[i, j] * \
+                        (beta * As[i].T @ Ps[j] @ Bs[i] + Ns[i].T) @ \
+                        solve(Qs[i] + beta * Bs[i].T @ Ps[j] @ Bs[i],
+                              beta * Bs[i].T @ Ps[j] @ As[i] + Ns[i])
 
-                Ps1[i][:, :] = Rs[i] + sum1 - sum2
-                error += np.max(np.abs(Ps1[i] - Ps[i]))
+            Ps1[i][:, :] = Rs[i] + sum1 - sum2
+            error += np.max(np.abs(Ps1[i] - Ps[i]))
 
-            Ps[:, :, :] = Ps1[:, :, :]
-            iteration += 1
+        Ps[:, :, :] = Ps1[:, :, :]
+        iteration += 1
 
     return Ps

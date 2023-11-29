@@ -41,7 +41,7 @@ def smooth(x, window_len=7, window='hanning'):
 
     if not window_len % 2:  # window_len is even
         window_len += 1
-        print("Window length reset to {}".format(window_len))
+        print(f"Window length reset to {window_len}")
 
     windows = {'hanning': np.hanning,
                'hamming': np.hamming,
@@ -57,11 +57,11 @@ def smooth(x, window_len=7, window='hanning'):
     s = np.concatenate((xb[::-1], x, xt[::-1]))
 
     # === Select window values === #
-    if window in windows.keys():
+    if window in windows:
         w = windows[window](window_len)
     else:
-        msg = "Unrecognized window type '{}'".format(window)
-        print(msg + " Defaulting to hanning")
+        msg = f"Unrecognized window type '{window}'"
+        print(f"{msg} Defaulting to hanning")
         w = windows['hanning'](window_len)
 
     return np.convolve(w / w.sum(), s, mode='valid')
@@ -102,7 +102,7 @@ def periodogram(x, window=None, window_len=7):
     n = len(x)
     I_w = np.abs(fft(x))**2 / n
     w = 2 * np.pi * np.arange(n) / n  # Fourier frequencies
-    w, I_w = w[:int(n/2)+1], I_w[:int(n/2)+1]  # Take only values on [0, pi]
+    w, I_w = w[:n // 2 + 1], I_w[:n // 2 + 1]
     if window:
         I_w = smooth(I_w, window_len=window_len, window=window)
     return w, I_w

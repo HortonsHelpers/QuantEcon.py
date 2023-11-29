@@ -67,7 +67,7 @@ def _s_wise_max_argmax(a_indices, a_indptr, vals, out_max, out_argmax):
     for i in range(n):
         if a_indptr[i] != a_indptr[i+1]:
             m = a_indptr[i]
-            for j in range(a_indptr[i]+1, a_indptr[i+1]):
+            for j in range(m + 1, a_indptr[i+1]):
                 if vals[j] > vals[m]:
                     m = j
             out_max[i] = vals[m]
@@ -80,7 +80,7 @@ def _s_wise_max(a_indices, a_indptr, vals, out_max):
     for i in range(n):
         if a_indptr[i] != a_indptr[i+1]:
             m = a_indptr[i]
-            for j in range(a_indptr[i]+1, a_indptr[i+1]):
+            for j in range(m + 1, a_indptr[i+1]):
                 if vals[j] > vals[m]:
                     m = j
             out_max[i] = vals[m]

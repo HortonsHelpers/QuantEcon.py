@@ -104,8 +104,7 @@ class LinearStateSpace:
         # = Check Input Shapes = #
         ni, nj = self.A.shape
         if ni != nj:
-            raise ValueError(
-                "Matrix A (shape: %s) needs to be square" % (self.A.shape, ))
+            raise ValueError(f"Matrix A (shape: {self.A.shape}) needs to be square")
         if ni != self.C.shape[0]:
             raise ValueError(
                 "Matrix C (shape: %s) does not have compatible dimensions "
@@ -398,7 +397,7 @@ class LinearStateSpace:
         xcoef = [C]
         ycoef = [np.dot(G, C)]
 
-        for i in range(j):
+        for _ in range(j):
             xcoef.append(np.dot(Apower, C))
             ycoef.append(np.dot(G, np.dot(Apower, C)))
             Apower = np.dot(Apower, A)

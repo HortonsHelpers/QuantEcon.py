@@ -141,13 +141,11 @@ def block_parser(part, rgxin, rgxout, fmtin, fmtout):
             decorator = line_stripped
             continue
 
-        # does this look like an input line?
-        matchin = rgxin.match(line)
-        if matchin:
+        if matchin := rgxin.match(line):
             lineno, inputline = int(matchin.group(1)), matchin.group(2)
 
             # the ....: continuation string
-            continuation = '   %s:'% ''.join(['.']*(len(str(lineno))+2))
+            continuation = f"   {''.join(['.'] * (len(str(lineno)) + 2))}:"
             Nc = len(continuation)
             # input lines can continue on for more than one line, if
             # we have a '\' line continuation char or a function call
@@ -176,10 +174,7 @@ def block_parser(part, rgxin, rgxout, fmtin, fmtout):
             block.append((INPUT, (decorator, inputline, '\n'.join(rest))))
             continue
 
-        # if it looks like an output line grab all the text to the end
-        # of the block
-        matchout = rgxout.match(line)
-        if matchout:
+        if matchout := rgxout.match(line):
             lineno, output = int(matchout.group(1)), matchout.group(2)
             if i<N-1:
                 output = '\n'.join([output] + lines[i:])
@@ -276,13 +271,13 @@ class EmbeddedSphinxShell(object):
         outfile = os.path.relpath(os.path.join(savefig_dir,filename),
                     source_dir)
 
-        imagerows = ['.. image:: %s'%outfile]
+        imagerows = [f'.. image:: {outfile}']
 
         for kwarg in saveargs[2:]:
             arg, val = kwarg.split('=')
             arg = arg.strip()
             val = val.strip()
-            imagerows.append('   :%s: %s'%(arg, val))
+            imagerows.append(f'   :{arg}: {val}')
 
         image_file = os.path.basename(outfile) # only return file name
         image_directive = '\n'.join(imagerows)
@@ -301,13 +296,13 @@ class EmbeddedSphinxShell(object):
         is_suppress = decorator=='@suppress' or self.is_suppress
         is_okexcept = decorator=='@okexcept' or self.is_okexcept
         is_savefig = decorator is not None and \
-                     decorator.startswith('@savefig')
+                         decorator.startswith('@savefig')
 
         input_lines = input.split('\n')
 
         self.datacontent = data
 
-        continuation = '   %s:'%''.join(['.']*(len(str(lineno))+2))
+        continuation = f"   {''.join(['.'] * (len(str(lineno)) + 2))}:"
 
         if is_savefig:
             image_file, image_directive = self.process_image(decorator)
@@ -330,13 +325,13 @@ class EmbeddedSphinxShell(object):
                 else:
                     # only submit the line in non-verbatim mode
                     self.process_input_line(line, store_history=store_history)
-                formatted_line = '%s %s'%(input_prompt, line)
+                formatted_line = f'{input_prompt} {line}'
             else:
                 # process a continuation line
                 if not is_verbatim:
                     self.process_input_line(line, store_history=store_history)
 
-                formatted_line = '%s%s'%(continuation, line)
+                formatted_line = f'{continuation}{line}'
 
             if not is_suppress:
                 ret.append(formatted_line)
@@ -379,8 +374,7 @@ class EmbeddedSphinxShell(object):
 
                 ind = found.find(output_prompt)
                 if ind<0:
-                    e='output prompt="%s" does not match out line=%s' % \
-                       (output_prompt, found)
+                    e = f'output prompt="{output_prompt}" does not match out line={found}'
                     raise RuntimeError(e)
                 found = found[len(output_prompt):].strip()
 
@@ -487,24 +481,22 @@ class EmbeddedSphinxShell(object):
                 continue
 
             # deal with multilines
-            if not multiline: # not currently on a multiline
-
-                if line_stripped.endswith('\\'): # now we are
-                    multiline = True
-                    cont_len = len(str(lineno)) + 2
-                    line_to_process = line.strip('\\')
-                    output.extend([u"%s %s" % (fmtin%lineno,line)])
-                    continue
-                else: # no we're still not
-                    line_to_process = line.strip('\\')
-            else: # we are currently on a multiline
+            if multiline: # we are currently on a multiline
                 line_to_process += line.strip('\\')
                 if line_stripped.endswith('\\'): # and we still are
                     continuation = '.' * cont_len
-                    output.extend([(u'   %s: '+line_stripped) % continuation])
+                    output.extend([f'   %s: {line_stripped}' % continuation])
                     continue
-                # else go ahead and run this multiline then carry on
+                        # else go ahead and run this multiline then carry on
 
+            elif line_stripped.endswith('\\'): # now we are
+                multiline = True
+                cont_len = len(str(lineno)) + 2
+                line_to_process = line.strip('\\')
+                output.extend([f"{fmtin % lineno} {line}"])
+                continue
+            else: # no we're still not
+                line_to_process = line.strip('\\')
             # get output of line
             self.process_input_line(unicode(line_to_process.strip()),
                                     store_history=False)
@@ -520,11 +512,11 @@ class EmbeddedSphinxShell(object):
 
             # line numbers don't actually matter, they're replaced later
             if not multiline:
-                in_line = u"%s %s" % (fmtin%lineno,line)
+                in_line = f"{fmtin % lineno} {line}"
 
                 output.extend([in_line])
             else:
-                output.extend([(u'   %s: '+line_stripped) % continuation])
+                output.extend([f'   %s: {line_stripped}' % continuation])
                 multiline = False
             if len(out_line):
                 output.extend([out_line])
@@ -570,9 +562,9 @@ class EmbeddedSphinxShell(object):
                 output.extend([line])
                 continue
 
-            continuation  = u'   %s:'% ''.join(['.']*(len(str(ct))+2))
+            continuation = f"   {''.join(['.'] * (len(str(ct)) + 2))}:"
             if not multiline:
-                modified = u"%s %s" % (fmtin % ct, line_stripped)
+                modified = f"{fmtin % ct} {line_stripped}"
                 output.append(modified)
                 ct += 1
                 try:
@@ -582,7 +574,7 @@ class EmbeddedSphinxShell(object):
                     multiline = True
                     multiline_start = lineno
             else:
-                modified = u'%s %s' % (continuation, line)
+                modified = f'{continuation} {line}'
                 output.append(modified)
 
                 try:
@@ -606,9 +598,7 @@ class EmbeddedSphinxShell(object):
 def _count_indent(x):
     import re
     m = re.match('(\s+)(.*)', x)
-    if not m:
-        return 0
-    return len(m.group(1))
+    return 0 if not m else len(m.group(1))
 
 class IpythonDirective(Directive):
 
@@ -662,8 +652,9 @@ class IpythonDirective(Directive):
 
         # setup bookmark for saving figures directory
 
-        self.shell.process_input_line('bookmark ipy_savedir %s'%savefig_dir,
-                                      store_history=False)
+        self.shell.process_input_line(
+            f'bookmark ipy_savedir {savefig_dir}', store_history=False
+        )
         self.shell.clear_cout()
 
         return rgxin, rgxout, promptin, promptout

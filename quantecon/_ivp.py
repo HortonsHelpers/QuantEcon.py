@@ -131,10 +131,7 @@ class IVP(integrate.ode):
                             for i in range(T)])
         rhs_ode = np.hstack((ti[:, np.newaxis], rhs_ode))
 
-        # should be roughly zero everywhere (if approximation is any good!)
-        residual = deriv - rhs_ode
-
-        return residual
+        return deriv - rhs_ode
 
     def solve(self, t0, y0, h=1.0, T=None, g=None, tol=None,
               integrator='dopri5', step=False, relax=False, **kwargs):
@@ -232,7 +229,4 @@ class IVP(integrate.ode):
         # evaluate the B-spline (returns a list)
         out = interpolate.splev(ti, tck, der, ext)
 
-        # convert to a 2D array
-        interp_traj = np.hstack((ti[:, np.newaxis], np.array(out).T))
-
-        return interp_traj
+        return np.hstack((ti[:, np.newaxis], np.array(out).T))

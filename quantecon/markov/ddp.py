@@ -312,13 +312,13 @@ class DiscreteDP:
                 raise ValueError('Q must be 2- or 3-dimensional')
 
         self.R = np.asarray(R)
-        if not (self.R.ndim in [1, 2]):
+        if self.R.ndim not in [1, 2]:
             raise ValueError('R must be 1- or 2-dimensional')
 
         msg_dimension = 'dimensions of R and Q must be either 1 and 2, ' \
-                        'or 2 and 3'
+                            'or 2 and 3'
         msg_shape = 'shapes of R and Q must be either (n, m) and (n, m, n), ' \
-                    'or (L,) and (L, n)'
+                        'or (L,) and (L, n)'
 
         if self._sa_pair:
             self.num_sa_pairs, self.num_states = self.Q.shape
@@ -332,8 +332,10 @@ class DiscreteDP:
                 raise ValueError('s_indices must be supplied')
             if a_indices is None:
                 raise ValueError('a_indices must be supplied')
-            if not (len(s_indices) == self.num_sa_pairs and
-                    len(a_indices) == self.num_sa_pairs):
+            if (
+                len(s_indices) != self.num_sa_pairs
+                or len(a_indices) != self.num_sa_pairs
+            ):
                 raise ValueError(
                     'length of s_indices and a_indices must be equal to '
                     'the number of state-action pairs'
@@ -494,14 +496,10 @@ class DiscreteDP:
 
         if self._sa_pair:
             return self
-        else:
-            s_ind, a_ind = np.where(self.R > - np.inf)
-            RL = self.R[s_ind, a_ind]
-            if sparse:
-                QL = sp.csr_matrix(self.Q[s_ind, a_ind])
-            else:
-                QL = self.Q[s_ind, a_ind]
-            return DiscreteDP(RL, QL, self.beta, s_ind, a_ind)
+        s_ind, a_ind = np.where(self.R > - np.inf)
+        RL = self.R[s_ind, a_ind]
+        QL = sp.csr_matrix(self.Q[s_ind, a_ind]) if sparse else self.Q[s_ind, a_ind]
+        return DiscreteDP(RL, QL, self.beta, s_ind, a_ind)
 
     def to_product_form(self):
         """
@@ -521,20 +519,19 @@ class DiscreteDP:
         un-modified
 
         """
-        if self._sa_pair:
-            ns = self.num_states
-            na = self.a_indices.max() + 1
-            R = np.full((ns, na), -np.inf)
-            R[self.s_indices, self.a_indices] = self.R
-            Q = np.zeros((ns, na, ns))
-            if self._sparse:
-                _fill_dense_Q(self.s_indices, self.a_indices,
-                              self.Q.toarray(), Q)
-            else:
-                _fill_dense_Q(self.s_indices, self.a_indices, self.Q, Q)
-            return DiscreteDP(R, Q, self.beta)
-        else:
+        if not self._sa_pair:
             return self
+        ns = self.num_states
+        na = self.a_indices.max() + 1
+        R = np.full((ns, na), -np.inf)
+        R[self.s_indices, self.a_indices] = self.R
+        Q = np.zeros((ns, na, ns))
+        if self._sparse:
+            _fill_dense_Q(self.s_indices, self.a_indices,
+                          self.Q.toarray(), Q)
+        else:
+            _fill_dense_Q(self.s_indices, self.a_indices, self.Q, Q)
+        return DiscreteDP(R, Q, self.beta)
 
     def RQ_sigma(self, sigma):
         """
@@ -662,9 +659,7 @@ class DiscreteDP:
 
         A = self._I - self.beta * Q_sigma
 
-        v_sigma = self._lineq_solve(A, b)
-
-        return v_sigma
+        return self._lineq_solve(A, b)
 
     def operator_iteration(self, T, v, max_iter, tol=None, *args, **kwargs):
         """
@@ -708,9 +703,7 @@ class DiscreteDP:
                 break
             v[:] = new_v
 
-        num_iter = i + 1
-
-        return num_iter
+        return i + 1
 
     def solve(self, method='policy_iteration',
               v_init=None, epsilon=None, max_iter=None, k=20):
@@ -803,15 +796,15 @@ class DiscreteDP:
                                            Tv=Tv)
         sigma = self.compute_greedy(v)
 
-        res = DPSolveResult(v=v,
-                            sigma=sigma,
-                            num_iter=num_iter,
-                            mc=self.controlled_mc(sigma),
-                            method='value iteration',
-                            epsilon=epsilon,
-                            max_iter=max_iter)
-
-        return res
+        return DPSolveResult(
+            v=v,
+            sigma=sigma,
+            num_iter=num_iter,
+            mc=self.controlled_mc(sigma),
+            method='value iteration',
+            epsilon=epsilon,
+            max_iter=max_iter,
+        )
 
     def policy_iteration(self, v_init=None, max_iter=None):
         """
@@ -843,14 +836,14 @@ class DiscreteDP:
 
         num_iter = i + 1
 
-        res = DPSolveResult(v=v_sigma,
-                            sigma=sigma,
-                            num_iter=num_iter,
-                            mc=self.controlled_mc(sigma),
-                            method='policy iteration',
-                            max_iter=max_iter)
-
-        return res
+        return DPSolveResult(
+            v=v_sigma,
+            sigma=sigma,
+            num_iter=num_iter,
+            mc=self.controlled_mc(sigma),
+            method='policy iteration',
+            max_iter=max_iter,
+        )
 
     def modified_policy_iteration(self, v_init=None, epsilon=None,
                                   max_iter=None, k=20):
@@ -936,14 +929,14 @@ class DiscreteDP:
             R, Q, self.beta, a_indices, a_indptr, sigma, max_iter=max_iter
         )
 
-        res = DPSolveResult(v=v,
-                            sigma=sigma,
-                            num_iter=num_iter,
-                            mc=self.controlled_mc(sigma),
-                            method='linear programming',
-                            max_iter=max_iter)
-
-        return res
+        return DPSolveResult(
+            v=v,
+            sigma=sigma,
+            num_iter=num_iter,
+            mc=self.controlled_mc(sigma),
+            method='linear programming',
+            max_iter=max_iter,
+        )
 
     def controlled_mc(self, sigma):
         """
@@ -1003,12 +996,10 @@ class DPSolveResult(dict):
     __delattr__ = dict.__delitem__
 
     def __repr__(self):
-        if self.keys():
-            m = max(map(len, list(self.keys()))) + 1
-            return '\n'.join([k.rjust(m) + ': ' + repr(v)
-                              for k, v in self.items()])
-        else:
-            return self.__class__.__name__ + "()"
+        if not self.keys():
+            return f"{self.__class__.__name__}()"
+        m = max(map(len, list(self.keys()))) + 1
+        return '\n'.join([f'{k.rjust(m)}: {repr(v)}' for k, v in self.items()])
 
     def __dir__(self):
         return self.keys()

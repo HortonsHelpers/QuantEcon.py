@@ -154,9 +154,9 @@ def linprog_simplex(c, A_ub=np.empty((0, 0)), b_ub=np.empty((0,)),
 
     b_signs = np.empty(L, dtype=np.bool_)
     for i in range(m):
-        b_signs[i] = True if b_ub[i] >= 0 else False
+        b_signs[i] = b_ub[i] >= 0
     for i in range(k):
-        b_signs[m+i] = True if b_eq[i] >= 0 else False
+        b_signs[m+i] = b_eq[i] >= 0
 
     # Construct initial tableau for Phase 1
     _initialize_tableau(A_ub, b_ub, A_eq, b_eq, tableau, basis)
@@ -534,6 +534,4 @@ def get_solution(tableau, basis, x, lambd, b_signs):
         lambd[j] = tableau[-1, aux_start+j]
         if lambd[j] != 0 and b_signs[j]:
             lambd[j] *= -1
-    fun = tableau[-1, -1] * (-1)
-
-    return fun
+    return tableau[-1, -1] * (-1)

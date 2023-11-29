@@ -53,6 +53,6 @@ def hamilton_filter(data, h, p=None):
         # cyclical component
         cycle = y - trend
     else:  # if p is not supplied (random walk)
-        cycle = np.append(np.zeros(h)+np.nan, y[h:T] - y[0:T-h])
+        cycle = np.append(np.zeros(h)+np.nan, y[h:T] - y[:T-h])
         trend = y - cycle
     return cycle, trend

@@ -125,8 +125,9 @@ def run_check(method, name):
     b = np.sqrt(3)
     true_fval = 0.408
     r = method(func_two, a, b)
-    assert_allclose(true_fval, r.root, atol=0.01, rtol=1e-5,
-                    err_msg='method %s' % name)
+    assert_allclose(
+        true_fval, r.root, atol=0.01, rtol=1e-5, err_msg=f'method {name}'
+    )
 
 
 def test_bisect_basic():

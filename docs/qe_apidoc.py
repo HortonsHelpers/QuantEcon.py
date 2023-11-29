@@ -189,7 +189,7 @@ def all_auto():
     # Write file for each module
     for mod in mod_names:
         name = mod.split(".")[0]  # drop .py ending
-        new_path = os.path.join("source", "modules", name + ".rst")
+        new_path = os.path.join("source", "modules", f"{name}.rst")
         with open(new_path, "w") as f:
             gen_module(name, f)
 
@@ -204,98 +204,80 @@ def all_auto():
 def model_tool():
     # list file names with game_theory
     game_theory_files = glob("../quantecon/game_theory/[a-z0-9]*.py")
-    game_theory = list(map(lambda x: x.split('/')[-1][:-3], game_theory_files))
-    # Alphabetize
-    game_theory.sort()
-
+    game_theory = sorted(map(lambda x: x.split('/')[-1][:-3], game_theory_files))
     # list file names with game_theory/game_generators
     game_generators_files = glob("../quantecon/game_theory/game_generators/[a-z0-9]*.py")
-    game_generators = list(
-        map(lambda x: x.split('/')[-1][:-3], game_generators_files))
-    # Alphabetize
-    game_generators.sort()
-
+    game_generators = sorted(
+        map(lambda x: x.split('/')[-1][:-3], game_generators_files)
+    )
     # list file names with markov
     markov_files = glob("../quantecon/markov/[a-z0-9]*.py")
-    markov = list(map(lambda x: x.split('/')[-1][:-3], markov_files))
-    # Alphabetize
-    markov.sort()
-
+    markov = sorted(map(lambda x: x.split('/')[-1][:-3], markov_files))
     # list file names with optimize
     optimize_files = glob("../quantecon/optimize/[a-z0-9]*.py")
-    optimize = list(map(lambda x: x.split('/')[-1][:-3], optimize_files))
-    # Alphabetize
-    optimize.sort()
-
+    optimize = sorted(map(lambda x: x.split('/')[-1][:-3], optimize_files))
     # list file names with random
     random_files = glob("../quantecon/random/[a-z0-9]*.py")
-    random = list(map(lambda x: x.split('/')[-1][:-3], random_files))
-    # Alphabetize
-    random.sort()
-
+    random = sorted(map(lambda x: x.split('/')[-1][:-3], random_files))
     # list file names of tools (base level modules)
     tool_files = glob("../quantecon/[a-z0-9]*.py")
-    tools = list(map(lambda x: x.split('/')[-1][:-3], tool_files))
-    # Alphabetize
-    tools.sort()
-
+    tools = sorted(map(lambda x: x.split('/')[-1][:-3], tool_files))
     # list file names of utilities
     util_files = glob("../quantecon/util/[a-z0-9]*.py")
-    util = list(map(lambda x: x.split('/')[-1][:-3], util_files))
-    # Alphabetize
-    util.sort()
-
+    util = sorted(map(lambda x: x.split('/')[-1][:-3], util_files))
     for folder in ["game_theory", "markov", "optimize", "random", "tools", "util"]:
         if not os.path.exists(source_join(folder)):
             os.makedirs(source_join(folder))
 
     # Write file for each game_theory file
     for mod in game_theory:
-        new_path = os.path.join("source", "game_theory", mod + ".rst")
+        new_path = os.path.join("source", "game_theory", f"{mod}.rst")
         with open(new_path, "w") as f:
             equals = "=" * len(mod)
             f.write(game_theory_module_template.format(mod_name=mod, equals=equals))
 
     for mod in game_generators:
-        new_path = os.path.join("source", "game_theory", "game_generators", mod + ".rst")
+        new_path = os.path.join(
+            "source", "game_theory", "game_generators", f"{mod}.rst"
+        )
         with open(new_path, "w") as f:
             equals = "=" * len(mod)
             f.write(game_generators_module_template.format(
                 mod_name=mod, equals=equals))
         #Add sudirectory to flat game_theory list for index file
-        game_theory.append("game_generators/{}".format(mod))
+        game_theory.append(f"game_generators/{mod}")
 
     # Write file for each markov file
     for mod in markov:
-        new_path = os.path.join("source", "markov", mod + ".rst")
+        new_path = os.path.join("source", "markov", f"{mod}.rst")
         with open(new_path, "w") as f:
             equals = "=" * len(mod)
             f.write(markov_module_template.format(mod_name=mod, equals=equals))
 
     # Write file for each optimize file
     for mod in optimize:
-        new_path = os.path.join("source", "optimize", mod + ".rst")
+        new_path = os.path.join("source", "optimize", f"{mod}.rst")
         with open(new_path, "w") as f:
             equals = "=" * len(mod)
             f.write(optimize_module_template.format(mod_name=mod, equals=equals))
 
     # Write file for each random file
     for mod in random:
-        new_path = os.path.join("source", "random", mod + ".rst")
+        new_path = os.path.join("source", "random", f"{mod}.rst")
         with open(new_path, "w") as f:
             equals = "=" * len(mod)
             f.write(random_module_template.format(mod_name=mod, equals=equals))
 
     # Write file for each tool (base level modules)
     for mod in tools:
-        new_path = os.path.join("source", "tools", mod + ".rst")
+        new_path = os.path.join("source", "tools", f"{mod}.rst")
         with open(new_path, "w") as f:
             equals = "=" * len(mod)
             f.write(module_template.format(mod_name=mod, equals=equals))
 
     # Write file for each utility
     for mod in util:
-        new_path = os.path.join("source", "util", mod + ".rst")
+        new_path = os.path.join("source", "util", f"{mod}.rst")
         with open(new_path, "w") as f:
             equals = "=" * len(mod)
             f.write(util_module_template.format(mod_name=mod, equals=equals))
@@ -320,7 +302,7 @@ def model_tool():
                      }
 
     for f_name in ("game_theory", "markov", "optimize", "random", "tools", "util"):
-        with open(source_join(f_name + ".rst"), "w") as f:
+        with open(source_join(f"{f_name}.rst"), "w") as f:
             m_name = f_name
             if f_name == "game_theory":
                 f_name = "Game Theory"                                             #Produce Nicer Title for Game Theory Module

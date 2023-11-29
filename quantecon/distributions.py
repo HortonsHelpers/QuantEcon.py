@@ -92,8 +92,7 @@ class BetaBinomial:
         """
         n, a, b = self.n, self.a, self.b
         k = np.arange(n + 1)
-        probs = binom(n, k) * beta(k + a, n - k + b) / beta(a, b)
-        return probs
+        return binom(n, k) * beta(k + a, n - k + b) / beta(a, b)
 
     # def cdf(self):
     #     r"""

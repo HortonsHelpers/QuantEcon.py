@@ -230,12 +230,12 @@ class DLE(object):
 
         # === Value of asset whose payout vector is Pay*xt === #
         # See p.145: Equation (7.11.1)
-        if isinstance(Pay, np.ndarray) == True:
+        if isinstance(Pay, np.ndarray):
             self.Za = Pay.T.dot(self.Mc)
             self.Q = solve_discrete_lyapunov(
                 self.A0.T * self.beta**0.5, self.Za)
             self.q = self.beta / (1 - self.beta) * \
-                np.trace(self.C.T.dot(self.Q).dot(self.C))
+                    np.trace(self.C.T.dot(self.Q).dot(self.C))
             self.Pay_Price = np.empty((ts_length + 1, 1))
             self.Pay_Gross = np.empty((ts_length + 1, 1))
             self.Pay_Gross[0, 0] = np.nan

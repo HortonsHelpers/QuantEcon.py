@@ -156,16 +156,15 @@ def blotto_game(h, t, rho, mu=0, random_state=None):
     """
     actions = simplex_grid(h, t)
     n = actions.shape[0]
-    payoff_arrays = tuple(np.empty((n, n)) for i in range(2))
+    payoff_arrays = tuple(np.empty((n, n)) for _ in range(2))
     mean = np.array([mu, mu])
     cov = np.array([[1, rho], [rho, 1]])
     random_state = check_random_state(random_state)
     values = random_state.multivariate_normal(mean, cov, h)
     _populate_blotto_payoff_arrays(payoff_arrays, actions, values)
-    g = NormalFormGame(
+    return NormalFormGame(
         [Player(payoff_array) for payoff_array in payoff_arrays]
     )
-    return g
 
 
 @jit(nopython=True)
@@ -252,7 +251,7 @@ def ranking_game(n, steps=10, random_state=None):
             [ 0.58,  0.58,  0.58,  0.58,  0.58]])
 
     """
-    payoff_arrays = tuple(np.empty((n, n)) for i in range(2))
+    payoff_arrays = tuple(np.empty((n, n)) for _ in range(2))
     random_state = check_random_state(random_state)
 
     scores = rng_integers(random_state, 1, steps+1, size=(2, n))
@@ -264,10 +263,9 @@ def ranking_game(n, steps=10, random_state=None):
     costs[:] /= (n * steps)
 
     _populate_ranking_payoff_arrays(payoff_arrays, scores, costs)
-    g = NormalFormGame(
+    return NormalFormGame(
         [Player(payoff_array) for payoff_array in payoff_arrays]
     )
-    return g
 
 
 @jit(nopython=True)
@@ -347,12 +345,11 @@ def sgc_game(k):
             [ 0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.75,  0.  ]])
 
     """
-    payoff_arrays = tuple(np.empty((4*k-1, 4*k-1)) for i in range(2))
+    payoff_arrays = tuple(np.empty((4*k-1, 4*k-1)) for _ in range(2))
     _populate_sgc_payoff_arrays(payoff_arrays)
-    g = NormalFormGame(
+    return NormalFormGame(
         [Player(payoff_array) for payoff_array in payoff_arrays]
     )
-    return g
 
 
 @jit(nopython=True)
@@ -468,10 +465,9 @@ def tournament_game(n, k, random_state=None):
     indices, indptr = tourn.csgraph.indices, tourn.csgraph.indptr
     _populate_tournament_payoff_array0(payoff_arrays[0], k, indices, indptr)
     _populate_tournament_payoff_array1(payoff_arrays[1], k)
-    g = NormalFormGame(
+    return NormalFormGame(
         [Player(payoff_array) for payoff_array in payoff_arrays]
     )
-    return g
 
 
 @jit(nopython=True)
@@ -614,7 +610,6 @@ def unit_vector_game(n, avoid_pure_nash=False, random_state=None):
                 one_ind = rng_integers(random_state, n)
             payoff_arrays[0][one_ind, i] = 1
 
-    g = NormalFormGame(
+    return NormalFormGame(
         [Player(payoff_array) for payoff_array in payoff_arrays]
     )
-    return g

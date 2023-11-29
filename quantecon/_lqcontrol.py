@@ -318,7 +318,7 @@ class LQ:
 
         # == Compute and record the sequence of policies == #
         policies = []
-        for t in range(T):
+        for _ in range(T):
             if self.T:  # Finite horizon case
                 self.update_values()
             policies.append(self.F)
@@ -520,7 +520,7 @@ class LQMarkov:
                                            max_iter=max_iter)
 
         # == calculate F and d == #
-        Fs = np.array([np.empty((k, n)) for i in range(m)])
+        Fs = np.array([np.empty((k, n)) for _ in range(m)])
         X = np.empty((m, m))
         sum1, sum2 = np.empty((k, k)), np.empty((k, n))
         for i in range(m):

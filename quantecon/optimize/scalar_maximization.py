@@ -101,17 +101,10 @@ def brent_max(func, a, b, args=(), xtol=1e-5, maxiter=500):
                 golden = 1
 
         if golden:  # Do a golden-section step
-            if xf >= xm:
-                e = a - xf
-            else:
-                e = b - xf
+            e = a - xf if xf >= xm else b - xf
             rat = golden_mean*e
 
-        if rat == 0:
-            si = np.sign(rat) + 1
-        else:
-            si = np.sign(rat)
-
+        si = np.sign(rat) + 1 if rat == 0 else np.sign(rat)
         x = xf + si * np.maximum(np.abs(rat), tol1)
         fu = -func(x, *args)
         num += 1

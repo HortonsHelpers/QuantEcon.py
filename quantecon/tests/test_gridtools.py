@@ -74,7 +74,7 @@ def test_performance_C():
     cartesian([x[:10], y[:10]]) # warmup
 
     t1 = time.time()
-    for i in range(100):
+    for _ in range(100):
         prod = cartesian([x, y])
     t2 = time.time()
     # print(prod.shape)
@@ -82,7 +82,7 @@ def test_performance_C():
     # compute the same produce using numpy:
 
     t3 = time.time()
-    for i in range(100):
+    for _ in range(100):
         prod_numpy = np.column_stack([
             np.repeat(x, N_y),
             np.tile(y, N_x)
@@ -90,8 +90,8 @@ def test_performance_C():
     t4 = time.time()
 
     print("Timings for 'cartesian' (C order)")
-    print("Cartesian: {}".format(t2-t1))
-    print("Numpy:     {}".format(t4-t3))
+    print(f"Cartesian: {t2 - t1}")
+    print(f"Numpy:     {t4 - t3}")
     assert_(abs(prod-prod_numpy).max() == 0)
 
 
@@ -105,7 +105,7 @@ def test_performance_F():
     cartesian([x[:10], y[:10]]) # warmup
 
     t1 = time.time()
-    for i in range(100):
+    for _ in range(100):
         prod = cartesian([x, y], order='F')
     t2 = time.time()
     # print(prod.shape)
@@ -113,7 +113,7 @@ def test_performance_F():
     # compute the same produce using numpy:
 
     t3 = time.time()
-    for i in range(100):
+    for _ in range(100):
         prod_numpy = np.column_stack([
             np.tile(x, N_y),
             np.repeat(y, N_x)
@@ -121,8 +121,8 @@ def test_performance_F():
     t4 = time.time()
 
     print("Timings for 'cartesian'(Fortran order)")
-    print("Cartesian: {}".format(t2-t1))
-    print("Numpy:     {}".format(t4-t3))
+    print(f"Cartesian: {t2 - t1}")
+    print(f"Numpy:     {t4 - t3}")
     assert_(abs(prod-prod_numpy).max() == 0)
 
 
@@ -143,8 +143,8 @@ def test_tile():
     t4 = time.time()
 
     print("Timings for 'tile' operation")
-    print("Repeat_1d: {}".format(t2-t1))
-    print("Numpy:     {}".format(t4-t3))
+    print(f"Repeat_1d: {t2 - t1}")
+    print(f"Numpy:     {t4 - t3}")
 
     assert_(abs(t_numpy-t_repeat).max())
 
@@ -161,8 +161,8 @@ def test_repeat():
     t4 = time.time()
 
     print("Timings for 'repeat' operation")
-    print("Repeat_1d: {}".format(t2-t1))
-    print("Numpy:     {}".format(t4-t3))
+    print(f"Repeat_1d: {t2 - t1}")
+    print(f"Numpy:     {t4 - t3}")
 
     assert_(abs(t_numpy-t_repeat).max())
 

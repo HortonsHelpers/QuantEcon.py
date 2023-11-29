@@ -115,11 +115,15 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
     """
     vertices = _initialize_simplex(x0, bounds)
 
-    results = _nelder_mead_algorithm(fun, vertices, bounds, args=args,
-                                     tol_f=tol_f, tol_x=tol_x,
-                                     max_iter=max_iter)
-
-    return results
+    return _nelder_mead_algorithm(
+        fun,
+        vertices,
+        bounds,
+        args=args,
+        tol_f=tol_f,
+        tol_x=tol_x,
+        max_iter=max_iter,
+    )
 
 
 @njit
@@ -375,7 +379,7 @@ def _check_params(ρ, χ, γ, σ, bounds, n):
     if σ < 0 or σ > 1:
         raise ValueError("σ must be strictly between 0 and 1.")
 
-    if not (bounds.shape == (0, 2) or bounds.shape == (n, 2)):
+    if bounds.shape not in [(0, 2), (n, 2)]:
         raise ValueError("The shape of `bounds` is not valid.")
     if (np.atleast_2d(bounds)[:, 0] > np.atleast_2d(bounds)[:, 1]).any():
         raise ValueError("Lower bounds must be greater than upper bounds.")
@@ -439,7 +443,4 @@ def _neg_bounded_fun(fun, bounds, x, args=()):
         `-fun(x, *args)` if x is within `bounds`, `np.inf` otherwise.
 
     """
-    if _check_bounds(x, bounds):
-        return -fun(x, *args)
-    else:
-        return np.inf
+    return -fun(x, *args) if _check_bounds(x, bounds) else np.inf

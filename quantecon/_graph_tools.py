@@ -101,10 +101,7 @@ class DiGraph:
     """
 
     def __init__(self, adj_matrix, weighted=False, node_labels=None):
-        if weighted:
-            dtype = None
-        else:
-            dtype = bool
+        dtype = None if weighted else bool
         self.csgraph = sparse.csr_matrix(adj_matrix, dtype=dtype)
 
         m, n = self.csgraph.shape
@@ -261,15 +258,9 @@ class DiGraph:
         # csgraph.reconstruct_path would raise an exception
         # github.com/scipy/scipy/issues/4018
         if self.n == 1:
-            if self.csgraph[0, 0] == 0:  # No edge: "trivial graph"
-                self._period = 1  # Any universally accepted definition?
-                self._cyclic_components_proj = np.zeros(self.n, dtype=int)
-                return None
-            else:  # Self loop
-                self._period = 1
-                self._cyclic_components_proj = np.zeros(self.n, dtype=int)
-                return None
-
+            self._period = 1  # Any universally accepted definition?
+            self._cyclic_components_proj = np.zeros(self.n, dtype=int)
+            return None
         if not self.is_strongly_connected:
             raise NotImplementedError(
                 'Not defined for a non strongly-connected digraph'
@@ -282,9 +273,9 @@ class DiGraph:
 
         # Construct a breadth-first search tree rooted at 0
         node_order, predecessors = \
-            csgraph.breadth_first_order(self.csgraph, i_start=0)
+                csgraph.breadth_first_order(self.csgraph, i_start=0)
         bfs_tree_csr = \
-            csgraph.reconstruct_path(self.csgraph, predecessors)
+                csgraph.reconstruct_path(self.csgraph, predecessors)
 
         # Edges not belonging to tree_csr
         non_bfs_tree_csr = self.csgraph - bfs_tree_csr
@@ -351,11 +342,7 @@ class DiGraph:
 
         weighted = True  # To copy the dtype
 
-        if self.node_labels is not None:
-            node_labels = self.node_labels[nodes]
-        else:
-            node_labels = None
-
+        node_labels = self.node_labels[nodes] if self.node_labels is not None else None
         return DiGraph(adj_matrix, weighted=weighted, node_labels=node_labels)
 
 
@@ -432,8 +419,5 @@ def _populate_random_tournament_row_col(n, r, row, col):
     k = 0
     for i in range(n):
         for j in range(i+1, n):
-            if r[k] < 0.5:
-                row[k], col[k] = i, j
-            else:
-                row[k], col[k] = j, i
+            row[k], col[k] = (i, j) if r[k] < 0.5 else (j, i)
             k += 1

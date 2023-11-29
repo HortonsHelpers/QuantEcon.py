@@ -36,8 +36,7 @@ def solow_model(t, k, g, n, s, alpha, delta):
         Time derivative of capital stock (per unit effective labor).
 
     """
-    k_dot = s * k**alpha - (g + n + delta) * k
-    return k_dot
+    return s * k**alpha - (g + n + delta) * k
 
 
 def solow_jacobian(t, k, g, n, s, alpha, delta):
@@ -68,8 +67,7 @@ def solow_jacobian(t, k, g, n, s, alpha, delta):
         Time derivative of capital stock (per unit effective labor).
 
     """
-    jac = s * alpha * k**(alpha - 1) - (g + n + delta)
-    return jac
+    return s * alpha * k**(alpha - 1) - (g + n + delta)
 
 
 def solow_steady_state(g, n, s, alpha, delta):
@@ -96,8 +94,7 @@ def solow_steady_state(g, n, s, alpha, delta):
         Steady state value of capital stock (per unit effective labor).
 
     """
-    k_star = (s / (n + g + delta))**(1 / (1 - alpha))
-    return k_star
+    return (s / (n + g + delta))**(1 / (1 - alpha))
 
 
 def solow_analytic_solution(t, k0, g, n, s, alpha, delta):
@@ -135,10 +132,7 @@ def solow_analytic_solution(t, k0, g, n, s, alpha, delta):
     k_t = (((s / (n + g + delta)) * (1 - np.exp(-lmbda * t)) +
             k0**(1 - alpha) * np.exp(-lmbda * t))**(1 / (1 - alpha)))
 
-    # combine into a (t.size, 2) array
-    analytic_traj = np.hstack((t[:, np.newaxis], k_t[:, np.newaxis]))
-
-    return analytic_traj
+    return np.hstack((t[:, np.newaxis], k_t[:, np.newaxis]))
 
 # create an instance of the IVP class
 valid_params = (0.02, 0.02, 0.15, 0.33, 0.05)
@@ -170,9 +164,8 @@ def _compute_fixed_length_solns(model, t0, k0):
 
 
 def _termination_condition(t, k, g, n, s, alpha, delta):
-        """Terminate solver when we get close to steady state."""
-        diff = k - solow_steady_state(g, n, s, alpha, delta)
-        return diff
+    """Terminate solver when we get close to steady state."""
+    return k - solow_steady_state(g, n, s, alpha, delta)
 
 
 def _compute_variable_length_solns(model, t0, k0, g, tol):

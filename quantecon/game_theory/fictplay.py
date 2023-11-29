@@ -36,20 +36,13 @@ class FictitiousPlay:
 
     """
     def __init__(self, data, gain=None):
-        if isinstance(data, NormalFormGame):
-            self.g = data
-        else:
-            self.g = NormalFormGame(data)
-
+        self.g = data if isinstance(data, NormalFormGame) else NormalFormGame(data)
         self.N = self.g.N
         self.players = self.g.players
         self.nums_actions = self.g.nums_actions
         self.tie_breaking = 'smallest'
 
-        if gain is None:
-            self.step_size = lambda t: 1 / (t+2)  # decreasing gain
-        else:
-            self.step_size = lambda t: gain  # constant gain
+        self.step_size = (lambda t: 1 / (t+2)) if gain is None else (lambda t: gain)
 
     def _play(self, actions, t, brs, tie_breaking, tol, random_state):
         for i, player in enumerate(self.players):

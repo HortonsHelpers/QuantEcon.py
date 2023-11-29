@@ -94,10 +94,7 @@ def k_array_rank(a):
 
     """
     k = len(a)
-    idx = int(a[0])  # Convert to Python int
-    for i in range(1, k):
-        idx += comb(a[i], i+1, exact=True)
-    return idx
+    return int(a[0]) + sum(comb(a[i], i+1, exact=True) for i in range(1, k))
 
 
 @jit(nopython=True, cache=True)

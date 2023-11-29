@@ -25,7 +25,7 @@ class TestNotebookUtils:
         """
         status = fetch_nb_dependencies(
             files=FILES, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDER)
-        assert(not (False in status))
+        assert False not in status
 
     def test_fetch_nb_dependencies_overwrite(self):
         """

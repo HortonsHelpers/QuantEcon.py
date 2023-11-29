@@ -42,8 +42,7 @@ def capture(command, *args, **kwargs):
 def get_data_dir():
     "Return directory where data is stored"
     this_dir = os.path.dirname(__file__)
-    data_dir = os.path.join(this_dir, "data")
-    return data_dir
+    return os.path.join(this_dir, "data")
 
 
 def max_abs_diff(a1, a2):

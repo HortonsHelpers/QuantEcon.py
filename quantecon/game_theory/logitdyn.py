@@ -36,11 +36,7 @@ class LogitDynamics:
 
     """
     def __init__(self, data, beta=1.0):
-        if isinstance(data, NormalFormGame):
-            self.g = data
-        else:  # data must be array_like
-            self.g = NormalFormGame(data)
-
+        self.g = data if isinstance(data, NormalFormGame) else NormalFormGame(data)
         self.N = self.g.N
         self.players = self.g.players
         self.nums_actions = self.g.nums_actions
@@ -49,11 +45,11 @@ class LogitDynamics:
 
         for player in self.players:
             payoff_array_rotated = \
-                player.payoff_array.transpose(list(range(1, self.N)) + [0])
+                    player.payoff_array.transpose(list(range(1, self.N)) + [0])
             payoff_array_rotated -= \
-                payoff_array_rotated.max(axis=-1)[..., np.newaxis]
+                    payoff_array_rotated.max(axis=-1)[..., np.newaxis]
             player.logit_choice_cdfs = \
-                np.exp(payoff_array_rotated*self.beta).cumsum(axis=-1)
+                    np.exp(payoff_array_rotated*self.beta).cumsum(axis=-1)
 
     def logit_choice_cdfs(self):
         """
@@ -67,13 +63,11 @@ class LogitDynamics:
 
         # Tuple of the actions of opponent players i+1, ..., N, 0, ..., i-1
         opponent_actions = \
-            tuple(actions[i+1:]) + tuple(actions[:i])
+                tuple(actions[i+1:]) + tuple(actions[:i])
 
         cdf = self.players[i].logit_choice_cdfs[opponent_actions]
         random_value = random_state.random()
-        next_action = cdf.searchsorted(random_value*cdf[-1], side='right')
-
-        return next_action
+        return cdf.searchsorted(random_value*cdf[-1], side='right')
 
     def play(self, init_actions=None, player_ind_seq=None, num_reps=1,
              random_state=None):
@@ -114,7 +108,7 @@ class LogitDynamics:
         if isinstance(player_ind_seq, numbers.Integral):
             player_ind_seq = [player_ind_seq]
 
-        for t, player_ind in enumerate(player_ind_seq):
+        for player_ind in player_ind_seq:
             random_state = check_random_state(random_state)
             init_actions[player_ind] = self._play(player_ind, init_actions,
                                                   random_state)

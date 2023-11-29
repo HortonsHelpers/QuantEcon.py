@@ -186,10 +186,7 @@ def test_ddp_sorting():
         assert_array_equal(ddp.a_indices, a_indices)
         assert_array_equal(ddp.a_indptr, a_indptr)
         assert_array_equal(ddp.R, R)
-        if sparse.issparse(ddp.Q):
-            ddp_Q = ddp.Q.toarray()
-        else:
-            ddp_Q = ddp.Q
+        ddp_Q = ddp.Q.toarray() if sparse.issparse(ddp.Q) else ddp.Q
         assert_array_equal(ddp_Q, Q)
 
 
@@ -258,7 +255,7 @@ def test_ddp_no_feasibile_action_error():
     s_indices = [0, 0, 2, 2]
     a_indices = [0, 1, 0, 1]
     R = [1, 0, 0, 1]
-    Q = [(1/3, 1/3, 1/3) for i in range(4)]
+    Q = [(1/3, 1/3, 1/3) for _ in range(4)]
     beta = 0.95
 
     assert_raises(ValueError, DiscreteDP, R, Q, beta, s_indices, a_indices)

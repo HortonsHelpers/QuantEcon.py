@@ -54,18 +54,22 @@ class TestPlayer_1opponent:
 
         seed = 1234
         brs = [
-            self.player.best_response([2/3, 1/3], tie_breaking='random',
-                                      random_state=seed)
-            for i in range(2)
+            self.player.best_response(
+                [2 / 3, 1 / 3], tie_breaking='random', random_state=seed
+            )
+            for _ in range(2)
         ]
         assert_(brs[0] == brs[1])
 
         # Generate seed by np.random.SeedSequence().entropy
         seed = 189001345436880673361166627406341705095
         brs = [
-            self.player.best_response([2/3, 1/3], tie_breaking='random',
-                                      random_state=np.random.default_rng(seed))
-            for i in range(2)
+            self.player.best_response(
+                [2 / 3, 1 / 3],
+                tie_breaking='random',
+                random_state=np.random.default_rng(seed),
+            )
+            for _ in range(2)
         ]
         assert_(brs[0] == brs[1])
 
@@ -251,7 +255,7 @@ class TestNormalFormGame_3p:
                               [[1, 0],
                                [5, 7]]]
         player = Player(payoffs_2opponents)
-        self.g = NormalFormGame([player for i in range(3)])
+        self.g = NormalFormGame([player for _ in range(3)])
 
     def test_getitem(self):
         assert_array_equal(self.g[0, 0, 1], [6, 4, 1])
@@ -325,8 +329,9 @@ def test_normalformgame_payoff_profile_array():
     nums_actions = (2, 3, 4)
     for N in range(1, len(nums_actions)+1):
         payoff_arrays = [
-            np.arange(np.prod(nums_actions[0:N])).reshape(nums_actions[i:N] +
-                                                          nums_actions[0:i])
+            np.arange(np.prod(nums_actions[:N])).reshape(
+                (nums_actions[i:N] + nums_actions[:i])
+            )
             for i in range(N)
         ]
         players = [Player(payoff_array) for payoff_array in payoff_arrays]
@@ -474,8 +479,8 @@ class TestPlayer_1action:
 def test_player_repr():
     nums_actions = (2, 3, 4)
     payoff_arrays = [
-        np.arange(np.prod(nums_actions[0:i])).reshape(nums_actions[0:i])
-        for i in range(1, len(nums_actions)+1)
+        np.arange(np.prod(nums_actions[:i])).reshape(nums_actions[:i])
+        for i in range(1, len(nums_actions) + 1)
     ]
     players = [Player(payoff_array) for payoff_array in payoff_arrays]
 

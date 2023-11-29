@@ -33,10 +33,7 @@ class TestBlottoGame:
         h, t = 3, 4
         rho = -0.5
         for gen in [lambda x: x, np.random.default_rng]:
-            gs = [
-                blotto_game(h, t, rho, random_state=gen(seed))
-                for i in range(2)
-            ]
+            gs = [blotto_game(h, t, rho, random_state=gen(seed)) for _ in range(2)]
             assert_array_equal(*[g.payoff_profile_array for g in gs])
 
 
@@ -63,7 +60,7 @@ class TestRankingGame:
         seed = 0
         n = 100
         for gen in [lambda x: x, np.random.default_rng]:
-            gs = [ranking_game(n, random_state=gen(seed)) for i in range(2)]
+            gs = [ranking_game(n, random_state=gen(seed)) for _ in range(2)]
             assert_array_equal(*[g.payoff_profile_array for g in gs])
 
 
@@ -102,8 +99,9 @@ class TestTournamentGame:
         for payoff_array in self.g.payoff_arrays:
             assert_(np.isin(payoff_array, possible_values).all())
 
-        max_num_dominated_subsets = \
-            sum([comb(i, self.k, exact=True) for i in range(self.n)])
+        max_num_dominated_subsets = sum(
+            comb(i, self.k, exact=True) for i in range(self.n)
+        )
         assert_(self.g.payoff_arrays[0].sum() <= max_num_dominated_subsets)
         assert_((self.g.payoff_arrays[1].sum(axis=1) == self.k).all())
 
@@ -112,7 +110,7 @@ class TestTournamentGame:
         for gen in [lambda x: x, np.random.default_rng]:
             gs = [
                 tournament_game(self.n, self.k, random_state=gen(seed))
-                for i in range(2)
+                for _ in range(2)
             ]
             assert_array_equal(*[g.payoff_profile_array for g in gs])
 
@@ -142,9 +140,7 @@ class TestUnitVectorGame:
         seed = 0
         n = 100
         for gen in [lambda x: x, np.random.default_rng]:
-            gs = [
-                unit_vector_game(n, random_state=gen(seed)) for i in range(2)
-            ]
+            gs = [unit_vector_game(n, random_state=gen(seed)) for _ in range(2)]
             assert_array_equal(*[g.payoff_profile_array for g in gs])
 
     def test_redraw(self):

@@ -255,8 +255,7 @@ def _get_action_profile(x, indptr):
 
     """
     N = len(indptr) - 1
-    action_profile = tuple(x[indptr[i]:indptr[i+1]] for i in range(N))
-    return action_profile
+    return tuple(x[indptr[i]:indptr[i+1]] for i in range(N))
 
 
 def _flatten_action_profile(action_profile, indptr):

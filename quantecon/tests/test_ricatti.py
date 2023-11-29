@@ -60,8 +60,7 @@ def dare_tjm_3(method):
          [0,        0]]
     A = np.array(A)
     B = I
-    R = [[1, r],
-         [r, r*r]]
+    R = [[1, r], [r, r**2]]
     Q = I - np.dot(A.T, A) + np.dot(A.T, np.linalg.solve(R + I, A))
     X = solve_discrete_riccati(A, B, Q, R, method=method)
     Y = np.identity(2)

@@ -77,9 +77,8 @@ class RepeatedGame:
 
         if method in ('abreu_sannikov', 'AS'):
             return _equilibrium_payoffs_abreu_sannikov(self, **options)
-        else:
-            msg = f"method {method} not supported."
-            raise NotImplementedError(msg)
+        msg = f"method {method} not supported."
+        raise NotImplementedError(msg)
 
 
 def _equilibrium_payoffs_abreu_sannikov(rpg, tol=1e-12, max_iter=500,
@@ -452,7 +451,5 @@ def _update_u(u, W):
     """
     for i in range(2):
         W_min = W[:, i].min()
-        if u[i] < W_min:
-            u[i] = W_min
-
+        u[i] = max(u[i], W_min)
     return u

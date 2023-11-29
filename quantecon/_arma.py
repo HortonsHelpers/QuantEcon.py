@@ -65,8 +65,7 @@ class ARMA:
         self.set_params()
 
     def __repr__(self):
-        m = "ARMA(phi=%s, theta=%s, sigma=%s)"
-        return m % (self.phi, self.theta, self.sigma)
+        return f"ARMA(phi={self.phi}, theta={self.theta}, sigma={self.sigma})"
 
     def __str__(self):
         m = "An ARMA({p}, {q}) process"
@@ -76,15 +75,13 @@ class ARMA:
 
     # Special latex print method for working in notebook
     def _repr_latex_(self):
-        m = r"$X_t = "
         phi = np.atleast_1d(self.phi)
         theta = np.atleast_1d(self.theta)
-        rhs = ""
-        for (tm, phi_p) in enumerate(phi):
-            # don't include terms if they are equal to zero
-            if abs(phi_p) > 1e-12:
-                rhs += r"%+g X_{t-%i}" % (phi_p, tm+1)
-
+        rhs = "".join(
+            r"%+g X_{t-%i}" % (phi_p, tm + 1)
+            for tm, phi_p in enumerate(phi)
+            if abs(phi_p) > 1e-12
+        )
         if rhs[0] == "+":
             rhs = rhs[1:]  # remove initial `+` if phi_1 was positive
 
@@ -95,7 +92,7 @@ class ARMA:
             if abs(th_q) > 1e-12:
                 rhs += r"%+g \epsilon_{t-%i}" % (th_q, tm+1)
 
-        return m + rhs + "$"
+        return f"$X_t = {rhs}$"
 
     @property
     def phi(self):

@@ -172,9 +172,7 @@ def _indiff_mixed_action(payoff_matrix, own_supp, opp_supp, A, out):
 
     for i in range(m):
         if not own_supp_flags[i]:
-            payoff = 0
-            for j in range(k):
-                payoff += payoff_matrix[i, opp_supp[j]] * out[j]
+            payoff = sum(payoff_matrix[i, opp_supp[j]] * out[j] for j in range(k))
             if payoff > val:
                 return False
     return True

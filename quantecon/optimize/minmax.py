@@ -54,10 +54,7 @@ def minmax(A, max_iter=10**6, piv_options=PivOptions()):
     m, n = A.shape
 
     min_ = A.min()
-    const = 0.
-    if min_ <= 0:
-        const = min_ * (-1) + 1
-
+    const = min_ * (-1) + 1 if min_ <= 0 else 0.
     tableau = np.zeros((m+2, n+1+m+1))
 
     for i in range(m):

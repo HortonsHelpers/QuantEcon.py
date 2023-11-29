@@ -195,7 +195,7 @@ def _lemke_howson_capping(payoff_matrices, tableaux, bases, init_pivot,
     max_iter_curr = max_iter
     total_num_iter = 0
 
-    for k in range(m+n-1):
+    for _ in range(m+n-1):
         capping_curr = min(max_iter_curr, capping)
 
         _initialize_tableaux(payoff_matrices, tableaux, bases)
@@ -303,10 +303,7 @@ def _initialize_tableaux(payoff_matrices, tableaux, bases):
                 tableaux[pl][i, py_start+j] = \
                     payoff_matrices[1-pl][i, j] + consts[1-pl]
             for j in range(nums_actions[1-pl]):
-                if j == i:
-                    tableaux[pl][i, sl_start+j] = 1
-                else:
-                    tableaux[pl][i, sl_start+j] = 0
+                tableaux[pl][i, sl_start+j] = 1 if j == i else 0
             tableaux[pl][i, -1] = 1
 
         for i in range(nums_actions[1-pl]):
@@ -374,11 +371,7 @@ def _lemke_howson_tbl(tableaux, bases, init_pivot, max_iter):
     (labeled as 3 and 4) with positive weights 0.0667 and 0.1333.
 
     """
-    init_player = 0
-    for k in bases[0]:
-        if k == init_pivot:
-            init_player = 1
-            break
+    init_player = next((1 for k in bases[0] if k == init_pivot), 0)
     pls = [init_player, 1 - init_player]
 
     pivot = init_pivot

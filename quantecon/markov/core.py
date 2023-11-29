@@ -182,10 +182,7 @@ class MarkovChain:
         self.n = self.P.shape[0]
 
         # Double check that P is a nonnegative matrix
-        if not self.is_sparse:
-            data_nonnegative = (self.P >= 0)  # ndarray
-        else:
-            data_nonnegative = (self.P.data >= 0)  # csr_matrx
+        data_nonnegative = (self.P >= 0) if not self.is_sparse else (self.P.data >= 0)
         if not np.all(data_nonnegative):
             raise ValueError('P must be nonnegative')
 
@@ -211,9 +208,8 @@ class MarkovChain:
 
         if self._stationary_dists is None:
             return msg.format(self.P)
-        else:
-            msg = msg + "\nand stationary distributions \n{1}"
-            return msg.format(self.P, self._stationary_dists)
+        msg += "\nand stationary distributions \n{1}"
+        return msg.format(self.P, self._stationary_dists)
 
     def __str__(self):
         return str(self.__repr__)
@@ -255,11 +251,7 @@ class MarkovChain:
             of indices if `value` is an array_like of state values.
 
         """
-        if self.state_values is None:
-            state_values_ndim = 1
-        else:
-            state_values_ndim = self.state_values.ndim
-
+        state_values_ndim = 1 if self.state_values is None else self.state_values.ndim
         values = np.asarray(value)
 
         if values.ndim <= state_values_ndim - 1:
@@ -299,8 +291,7 @@ class MarkovChain:
         # if self.state_values is not None:
         if self.state_values.ndim == 1:
             try:
-                idx = np.where(self.state_values == value)[0][0]
-                return idx
+                return np.where(self.state_values == value)[0][0]
             except IndexError:
                 raise ValueError(error_msg)
         else:
@@ -347,23 +338,19 @@ class MarkovChain:
 
     @property
     def is_aperiodic(self):
-        if self.is_irreducible:
-            return self.digraph.is_aperiodic
-        else:
-            return self.period == 1
+        return self.digraph.is_aperiodic if self.is_irreducible else self.period == 1
 
     @property
     def period(self):
         if self.is_irreducible:
             return self.digraph.period
-        else:
-            # Determine the period, the LCM of the periods of rec_classes
-            d = 1
-            for rec_class in self.recurrent_classes_indices:
-                period = self.digraph.subgraph(rec_class).period
-                d = (d * period) // gcd(d, period)
+        # Determine the period, the LCM of the periods of rec_classes
+        d = 1
+        for rec_class in self.recurrent_classes_indices:
+            period = self.digraph.subgraph(rec_class).period
+            d = (d * period) // gcd(d, period)
 
-            return d
+        return d
 
     @property
     def cyclic_classes(self):
@@ -518,10 +505,7 @@ class MarkovChain:
                 random_values, out=X
             )
 
-        if dim == 1:
-            return X[0]
-        else:
-            return X
+        return X[0] if dim == 1 else X
 
     def simulate(self, ts_length, init=None, num_reps=None, random_state=None):
         """
@@ -557,10 +541,7 @@ class MarkovChain:
             if (init, num_reps) = (array, int).
 
         """
-        if init is not None:
-            init_idx = self.get_index(init)
-        else:
-            init_idx = None
+        init_idx = self.get_index(init) if init is not None else None
         X = self.simulate_indices(ts_length, init=init_idx, num_reps=num_reps,
                                   random_state=random_state)
 

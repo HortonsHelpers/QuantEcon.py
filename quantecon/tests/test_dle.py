@@ -95,7 +95,7 @@ class TestDLE:
             'hss' : np.array([[5.]]),
         }
         self.dle.compute_steadystate()
-        for item in solutions.keys():
+        for item in solutions:
             assert_allclose(self.dle.__dict__[
                             item], solutions[item], atol=ATOL)
 
@@ -106,6 +106,6 @@ class TestDLE:
             'ubhat': np.array([[30., -0., -0.]])
         }
         self.dle.canonical()
-        for item in solutions.keys():
+        for item in solutions:
             assert_allclose(self.dle.__dict__[
                             item], solutions[item], atol=ATOL)

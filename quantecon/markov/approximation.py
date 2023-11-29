@@ -225,9 +225,7 @@ def tauchen(n, rho, sigma, mu=0., n_std=3):
     # shifts the state values by the long run mean of y_t
     mu = mu / (1 - rho)
 
-    mc = MarkovChain(P, state_values=x+mu)
-
-    return mc
+    return MarkovChain(P, state_values=x+mu)
 
 
 @njit
@@ -416,7 +414,7 @@ def discrete_var(A,
         u = random_state.standard_normal(size=(sim_length-1, r))
     else:
         u = rv.rvs(size=sim_length-1, random_state=random_state)
-    
+
     v = C @ u.T
     x0 = np.zeros(m)
     X = simulate_linear_model(A, x0, v, ts_length=sim_length)
@@ -436,7 +434,4 @@ def discrete_var(A,
     V = [np.linspace(-upper_bounds[i], upper_bounds[i], grid_sizes[i])
          for i in range(m)]
 
-    # Fit the Markov chain
-    mc = fit_discrete_mc(X.T, V, order=order)
-
-    return mc
+    return fit_discrete_mc(X.T, V, order=order)

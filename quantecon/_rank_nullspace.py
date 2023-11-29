@@ -44,9 +44,7 @@ def rank_est(A, atol=1e-13, rtol=0):
     A = np.atleast_2d(A)
     s = svd(A, compute_uv=False)
     tol = max(atol, rtol * s[0])
-    rank = int((s >= tol).sum())
-
-    return rank
+    return int((s >= tol).sum())
 
 
 def nullspace(A, atol=1e-13, rtol=0):
@@ -90,6 +88,4 @@ def nullspace(A, atol=1e-13, rtol=0):
     u, s, vh = svd(A)
     tol = max(atol, rtol * s[0])
     nnz = (s >= tol).sum()
-    ns = vh[nnz:].conj().T
-
-    return ns
+    return vh[nnz:].conj().T

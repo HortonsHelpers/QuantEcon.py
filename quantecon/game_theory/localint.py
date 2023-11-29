@@ -47,7 +47,7 @@ class LocalInteraction:
             raise ValueError('payoff matrix must be square')
         self.num_actions = A.shape[0]
 
-        self.players = [Player(A) for i in range(self.N)]
+        self.players = [Player(A) for _ in range(self.N)]
         self.tie_breaking = 'smallest'
 
     def _play(self, actions, player_ind, tie_breaking, tol, random_state):

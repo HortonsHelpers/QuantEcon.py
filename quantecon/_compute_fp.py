@@ -220,8 +220,8 @@ def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
     X[0], Y[0] = x_new, y_new
     x_new = Y[0]
 
-    tableaux = tuple(np.empty((buff_size, buff_size*2+1)) for i in range(2))
-    bases = tuple(np.empty(buff_size, dtype=int) for i in range(2))
+    tableaux = tuple(np.empty((buff_size, buff_size*2+1)) for _ in range(2))
+    bases = tuple(np.empty(buff_size, dtype=int) for _ in range(2))
     max_piv = 10**6  # Max number of pivoting steps in _lemke_howson_tbl
 
     while True:
@@ -248,9 +248,8 @@ def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
             X[:X_tmp.shape[0]], Y[:Y_tmp.shape[0]] = X_tmp, Y_tmp
             X[iterate-1], Y[iterate-1] = x_new, y_new
 
-            tableaux = tuple(np.empty((buff_size, buff_size*2+1))
-                             for i in range(2))
-            bases = tuple(np.empty(buff_size, dtype=int) for i in range(2))
+            tableaux = tuple(np.empty((buff_size, buff_size*2+1)) for _ in range(2))
+            bases = tuple(np.empty(buff_size, dtype=int) for _ in range(2))
 
         m = iterate
         tableaux_curr = tuple(tableau[:m, :2*m+1] for tableau in tableaux)
@@ -317,10 +316,7 @@ def _initialize_tableaux_ig(X, Y, tableaux, bases):
     # Mover
     for i in range(m):
         for j in range(2*m):
-            if j == i or j == i + m:
-                tableaux[0][i, j] = 1
-            else:
-                tableaux[0][i, j] = 0
+            tableaux[0][i, j] = 1 if j in [i, i + m] else 0
         # Right hand side
         tableaux[0][i, 2*m] = 1
 
@@ -328,10 +324,7 @@ def _initialize_tableaux_ig(X, Y, tableaux, bases):
     for i in range(m):
         # Slack variables
         for j in range(m):
-            if j == i:
-                tableaux[1][i, j] = 1
-            else:
-                tableaux[1][i, j] = 0
+            tableaux[1][i, j] = 1 if j == i else 0
         # Payoff variables
         for j in range(m):
             d = X[i] - Y[j]
@@ -366,7 +359,4 @@ def _square_sum_ol(a):
 
 
 def _square_sum_array(a):  # pragma: no cover
-    sum_ = 0
-    for x in a.flat:
-        sum_ += x**2
-    return sum_
+    return sum(x**2 for x in a.flat)

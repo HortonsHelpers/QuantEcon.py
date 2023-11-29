@@ -67,10 +67,7 @@ class Kalman:
         self._Sigma_infinity = None
 
     def set_state(self, x_hat, Sigma):
-        if Sigma is None:
-            self.Sigma = np.identity(self.ss.n)
-        else:
-            self.Sigma = np.atleast_2d(Sigma)
+        self.Sigma = np.identity(self.ss.n) if Sigma is None else np.atleast_2d(Sigma)
         if x_hat is None:
             self.x_hat = np.zeros((self.ss.n, 1))
         else:

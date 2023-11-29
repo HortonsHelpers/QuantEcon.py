@@ -54,13 +54,11 @@ def easom(x):
 def perm_function(x, β):
     # https://www.sfu.ca/~ssurjano/perm0db.html
     d = x.size
-    f = 0
-    for i in range(1, d+1):
-        temp = 0
-        for j in range(1, d+1):
-            temp += (j + β) * (x[j-1] ** i - 1 / (j ** i))
-        f += temp ** 2
-
+    f = sum(
+        sum((j + β) * (x[j - 1] ** i - 1 / (j**i)) for j in range(1, d + 1))
+        ** 2
+        for i in range(1, d + 1)
+    )
     return -f
 
 

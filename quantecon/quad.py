@@ -29,10 +29,7 @@ def gammaln(x):
 
 @vectorize(nopython=True)
 def fix(x):
-    if x < 0:
-        return math.ceil(x)
-    else:
-        return math.floor(x)
+    return math.ceil(x) if x < 0 else math.floor(x)
 
 
 # ------------------ #
@@ -265,17 +262,9 @@ def qnwnorm(n, mu=None, sig2=None, usesqrtm=False):
     n = np.atleast_1d(n)
     d = n.size
 
-    if mu is None:
-        mu = np.zeros(d)
-    else:
-        mu = np.atleast_1d(mu)
-
-    if sig2 is None:
-        sig2 = np.eye(d)
-    else:
-        sig2 = np.atleast_1d(sig2).reshape(d, d)
-
-    if all([x.size == 1 for x in [n, mu, sig2]]):
+    mu = np.zeros(d) if mu is None else np.atleast_1d(mu)
+    sig2 = np.eye(d) if sig2 is None else np.atleast_1d(sig2).reshape(d, d)
+    if all(x.size == 1 for x in [n, mu, sig2]):
         nodes, weights = _qnwnorm1(n[0])
     else:
         nodes = []
@@ -289,16 +278,8 @@ def qnwnorm(n, mu=None, sig2=None, usesqrtm=False):
         nodes = gridmake(*nodes)
         weights = ckron(*weights[::-1])
 
-    if usesqrtm:
-        new_sig2 = la.sqrtm(sig2)
-    else:  # cholesky
-        new_sig2 = la.cholesky(sig2)
-
-    if d > 1:
-        nodes = nodes.dot(new_sig2) + mu  # Broadcast ok
-    else:  # nodes.dot(sig) will not be aligned in scalar case.
-        nodes = nodes * new_sig2 + mu
-
+    new_sig2 = la.sqrtm(sig2) if usesqrtm else la.cholesky(sig2)
+    nodes = nodes.dot(new_sig2) + mu if d > 1 else nodes * new_sig2 + mu
     return nodes.squeeze(), weights
 
 
@@ -547,8 +528,7 @@ def quadrect(f, n, a, b, kind='lege', random_state=None, *args, **kwargs):
     else:
         nodes, weights = qnwequi(n, a, b, kind, random_state=random_state)
 
-    out = weights.dot(f(nodes, *args, **kwargs))
-    return out
+    return weights.dot(f(nodes, *args, **kwargs))
 
 
 def qnwbeta(n, a=1.0, b=1.0):
@@ -667,7 +647,7 @@ def _make_multidim_func(one_d_func, n, *args):
     n = np.atleast_1d(n)
     args = list(map(np.atleast_1d, _args))
 
-    if all([x.size == 1 for x in [n] + args]):
+    if all(x.size == 1 for x in [n] + args):
         return one_d_func(n[0], *_args)
 
     d = n.size

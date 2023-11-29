@@ -55,10 +55,7 @@ def _numba_linalg_solve_ol(a, b):
 
     def _numba_linalg_solve_impl(a, b):  # pragma: no cover
         n = a.shape[-1]
-        if b.ndim == 1:
-            nrhs = 1
-        else:  # b.ndim == 2
-            nrhs = b.shape[-1]
+        nrhs = 1 if b.ndim == 1 else b.shape[-1]
         F_INT_nptype = np.int32
         ipiv = np.empty(n, dtype=F_INT_nptype)
 

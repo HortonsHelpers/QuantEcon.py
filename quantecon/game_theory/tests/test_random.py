@@ -20,7 +20,7 @@ def test_random_game():
     seed = 227108210370342174739429861866005407311
     gs = [
         random_game(nums_actions, random_state=np.random.default_rng(seed))
-        for i in range(2)
+        for _ in range(2)
     ]
     assert_array_equal(*[g.payoff_profile_array for g in gs])
 
@@ -35,9 +35,10 @@ def test_covariance_game():
 
     seed = 289722416785475140936980467255496855908
     gs = [
-        covariance_game(nums_actions, rho=rho,
-                        random_state=np.random.default_rng(seed))
-        for i in range(2)
+        covariance_game(
+            nums_actions, rho=rho, random_state=np.random.default_rng(seed)
+        )
+        for _ in range(2)
     ]
     assert_array_equal(*[g.payoff_profile_array for g in gs])
 
@@ -50,7 +51,7 @@ def test_covariance_game():
 
     rho = -1 / (N - 1)
     g = covariance_game(nums_actions, rho=rho)
-    for a in np.ndindex(*nums_actions):
+    for _ in np.ndindex(*nums_actions):
         assert_allclose(g.payoff_profile_array.sum(axis=-1),
                         np.zeros(nums_actions),
                         atol=1e-10)
@@ -83,7 +84,7 @@ def test_random_pure_actions():
     seed = 1234
     for gen in [lambda x: x, np.random.default_rng]:
         action_profiles = [
-            random_pure_actions(nums_actions, gen(seed)) for i in range(2)
+            random_pure_actions(nums_actions, gen(seed)) for _ in range(2)
         ]
         for i in range(N):
             assert_(action_profiles[0][i] < nums_actions[i])
@@ -94,4 +95,4 @@ def test_random_mixed_actions():
     nums_actions = (2, 3, 4)
     seed = 1234
     action_profile = random_mixed_actions(nums_actions, seed)
-    assert_(tuple([len(action) for action in action_profile]) == nums_actions)
+    assert_(tuple(len(action) for action in action_profile) == nums_actions)

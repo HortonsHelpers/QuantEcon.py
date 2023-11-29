@@ -46,12 +46,10 @@ class NashResult(dict):
     __delattr__ = dict.__delitem__
 
     def __repr__(self):
-        if self.keys():
-            m = max(map(len, list(self.keys()))) + 1
-            return '\n'.join([k.rjust(m) + ': ' + repr(v)
-                              for k, v in sorted(self.items())])
-        else:
-            return self.__class__.__name__ + "()"
+        if not self.keys():
+            return f"{self.__class__.__name__}()"
+        m = max(map(len, list(self.keys()))) + 1
+        return '\n'.join([f'{k.rjust(m)}: {repr(v)}' for k, v in sorted(self.items())])
 
     def __dir__(self):
         return self.keys()

@@ -31,9 +31,14 @@ class TestBRD:
 
     def test_time_series_2(self):
         seed = 329478856717593533176523622896549543480
-        x = [self.brd.time_series(ts_length=3, init_action_dist=[2, 2],
-                                  random_state=np.random.default_rng(seed))
-             for i in range(2)]
+        x = [
+            self.brd.time_series(
+                ts_length=3,
+                init_action_dist=[2, 2],
+                random_state=np.random.default_rng(seed),
+            )
+            for _ in range(2)
+        ]
         assert_array_equal(x[0], x[1])
 
 
@@ -48,9 +53,14 @@ class TestKMR:
 
     def test_time_series(self):
         seed = 21519527815966711149598801341951879349
-        x = [self.kmr.time_series(ts_length=3, init_action_dist=[2, 2],
-                                  random_state=np.random.default_rng(seed))
-             for i in range(2)]
+        x = [
+            self.kmr.time_series(
+                ts_length=3,
+                init_action_dist=[2, 2],
+                random_state=np.random.default_rng(seed),
+            )
+            for _ in range(2)
+        ]
         assert_array_equal(x[0], x[1])
 
 
@@ -65,7 +75,12 @@ class TestSamplingBRD:
 
     def test_time_series(self):
         seed = 205165126657120054758393970887343077472
-        x = [self.sbrd.time_series(ts_length=3, init_action_dist=[2, 2],
-                                   random_state=np.random.default_rng(seed))
-             for i in range(2)]
+        x = [
+            self.sbrd.time_series(
+                ts_length=3,
+                init_action_dist=[2, 2],
+                random_state=np.random.default_rng(seed),
+            )
+            for _ in range(2)
+        ]
         assert_array_equal(x[0], x[1])

@@ -184,13 +184,15 @@ class Player:
         l = s.splitlines()
         for i in range(1, len(l)):
             if l[i]:
-                l[i] = ' ' + l[i]
+                l[i] = f' {l[i]}'
         return '\n'.join(l)
 
     def __str__(self):
         N = self.num_opponents + 1
-        s = 'Player in a {N}-player normal form game'.format(N=N)
-        s += ' with payoff array:\n'
+        s = (
+            'Player in a {N}-player normal form game'.format(N=N)
+            + ' with payoff array:\n'
+        )
         s += np.array2string(self.payoff_array, separator=', ')
         return s
 
@@ -405,20 +407,9 @@ class Player:
         """
         random_state = check_random_state(random_state)
 
-        if actions is not None:
-            n = len(actions)
-        else:
-            n = self.num_actions
-
-        if n == 1:
-            idx = 0
-        else:
-            idx = rng_integers(random_state, n)
-
-        if actions is not None:
-            return actions[idx]
-        else:
-            return idx
+        n = len(actions) if actions is not None else self.num_actions
+        idx = 0 if n == 1 else rng_integers(random_state, n)
+        return actions[idx] if actions is not None else idx
 
     def is_dominated(self, action, tol=None, method=None):
         """
@@ -518,11 +509,11 @@ class Player:
             strictly dominated by some mixed action.
 
         """
-        out = []
-        for action in range(self.num_actions):
-            if self.is_dominated(action, tol=tol, method=method):
-                out.append(action)
-        return out
+        return [
+            action
+            for action in range(self.num_actions)
+            if self.is_dominated(action, tol=tol, method=method)
+        ]
 
 
 class NormalFormGame:
@@ -566,18 +557,14 @@ class NormalFormGame:
     def __init__(self, data, dtype=None):
         # data represents an array_like of Players
         if hasattr(data, '__getitem__') and isinstance(data[0], Player):
-            N = len(data)
-
             # Check that the shapes of the payoff arrays are consistent
             # and the dtypes coincide
             shape_0 = data[0].payoff_array.shape
             dtype_0 = data[0].payoff_array.dtype
+            N = len(data)
             for i in range(1, N):
                 shape = data[i].payoff_array.shape
-                if not (
-                    len(shape) == N and
-                    shape == shape_0[i:] + shape_0[:i]
-                ):
+                if len(shape) != N or shape != shape_0[i:] + shape_0[:i]:
                     raise ValueError(
                         'shapes of payoff arrays must be consistent'
                     )
@@ -590,7 +577,6 @@ class NormalFormGame:
             self.players = tuple(data)
             self.dtype = dtype_0
 
-        # data represents action sizes or a payoff array
         else:
             data = np.asarray(data)
 
@@ -621,7 +607,7 @@ class NormalFormGame:
                         'by a square matrix'
                     )
                 N = 2
-                self.players = tuple(Player(data) for i in range(N))
+                self.players = tuple(Player(data) for _ in range(N))
                 self.dtype = data.dtype
 
             else:  # data represents a payoff array
@@ -640,7 +626,7 @@ class NormalFormGame:
                 )
                 for i, payoff_array in enumerate(payoff_arrays):
                     payoff_array[:] = \
-                        data.take(i, axis=-1).transpose(list(range(i, N)) +
+                            data.take(i, axis=-1).transpose(list(range(i, N)) +
                                                         list(range(i)))
                 self.players = tuple(
                     Player(payoff_array) for payoff_array in payoff_arrays
@@ -809,7 +795,7 @@ class NormalFormGame:
         if self.N == 2:
             for i, player in enumerate(self.players):
                 own_action, opponent_action = \
-                    action_profile[i], action_profile[1-i]
+                        action_profile[i], action_profile[1-i]
                 if not player.is_best_response(own_action, opponent_action,
                                                tol):
                     return False
@@ -818,36 +804,35 @@ class NormalFormGame:
             for i, player in enumerate(self.players):
                 own_action = action_profile[i]
                 opponents_actions = \
-                    tuple(action_profile[i+1:]) + tuple(action_profile[:i])
+                        tuple(action_profile[i+1:]) + tuple(action_profile[:i])
 
                 if not player.is_best_response(own_action, opponents_actions,
                                                tol):
                     return False
 
-        else:  # Trivial case with self.N == 1
-            if not self.players[0].is_best_response(action_profile[0], None,
+        elif not self.players[0].is_best_response(action_profile[0], None,
                                                     tol):
-                return False
+            return False
 
         return True
 
 
 def _nums_actions2string(nums_actions):
-    if len(nums_actions) == 1:
-        s = '{0}-action'.format(nums_actions[0])
-    else:
-        s = 'x'.join(map(str, nums_actions))
-    return s
+    return (
+        '{0}-action'.format(nums_actions[0])
+        if len(nums_actions) == 1
+        else 'x'.join(map(str, nums_actions))
+    )
 
 
 def _payoff_profile_array2string(payoff_profile_array, class_name=None):
     s = np.array2string(payoff_profile_array, separator=', ')
 
     # Remove one linebreak
-    s = re.sub(r'(\n+)', lambda x: x.group(0)[0:-1], s)
+    s = re.sub(r'(\n+)', lambda x: x.group(0)[:-1], s)
 
     if class_name is not None:
-        prefix = class_name + '('
+        prefix = f'{class_name}('
         next_line_prefix = ' ' * len(prefix)
         suffix = ')'
         l = s.splitlines()

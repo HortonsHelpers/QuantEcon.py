@@ -187,14 +187,13 @@ def cartesian_nearest_index(x, nodes, order='C'):
 
     n = shape[1-is_1d]
     if len(nodes) != n:
-        msg = 'point `x`' if is_1d else 'points in `x`'
-        msg += ' must have same length as `nodes`'
+        msg = (
+            'point `x`' if is_1d else 'points in `x`'
+        ) + ' must have same length as `nodes`'
         raise ValueError(msg)
 
     out = _cartesian_nearest_indices(x, nodes, order=order)
-    if is_1d:
-        return out[0]
-    return out
+    return out[0] if is_1d else out
 
 
 @njit(cache=True)

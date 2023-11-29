@@ -198,10 +198,7 @@ class Test_markovchain_stationary_distributions_KMRMarkovMatrix2():
         self.stationary = self.mc.stationary_distributions
         stat_shape = self.stationary.shape
 
-        if len(stat_shape) == 1:
-            self.n_stat_dists = 1
-        else:
-            self.n_stat_dists = stat_shape[0]
+        self.n_stat_dists = 1 if len(stat_shape) == 1 else stat_shape[0]
 
     def test_markov_matrix(self):
         "Check that each row of matrix sums to 1"
@@ -431,13 +428,13 @@ class TestMCStateValues:
         }
 
     def test_com_rec_classes(self):
+        suffix = '_indices'
         for mc_dict in [self.mc_reducible_dict, self.mc_periodic_dict]:
             mc = mc_dict['mc']
             coms = mc_dict['coms']
             recs = mc_dict['recs']
             properties = ['communication_classes',
                           'recurrent_classes']
-            suffix = '_indices'
             for prop0, classes_ind in zip(properties, [coms, recs]):
                 for return_indices in [True, False]:
                     if return_indices:

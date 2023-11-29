@@ -40,8 +40,7 @@ def estimate_mc(X):
     P = _count_transition_frequencies(indices, P)
     P /= P.sum(1)[:, np.newaxis]
 
-    mc = MarkovChain(P, state_values=state_values)
-    return mc
+    return MarkovChain(P, state_values=state_values)
 
 
 @njit(cache=True)

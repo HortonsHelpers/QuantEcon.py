@@ -147,9 +147,7 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
 
     random_state = check_random_state(random_state)
     r = random_state.random(size=size)
-    result = _sample_without_replacement(n, r)
-
-    return result
+    return _sample_without_replacement(n, r)
 
 
 @guvectorize(['(i8, f8[:], i8[:])'], '(),(k)->(k)', nopython=True, cache=True)

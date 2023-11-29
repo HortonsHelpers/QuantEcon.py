@@ -82,20 +82,24 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
     #-Obtain each requested file-#
     for directory in files.keys():
         if directory != "":
-            if verbose: print("Parsing directory: %s"%directory)
+            if verbose:
+                print(f"Parsing directory: {directory}")
         for fl in files[directory]:
             if directory != "":
-                fl = directory+"/"+fl
+                fl = f"{directory}/{fl}"
             #-Check for Local Copy of File (Default Behaviour is to Skip)-#
-            if not overwrite:
-                if os.path.isfile(fl):
-                    if verbose: print(
-                        "A file named %s already exists in the specified directory ... skipping download." % fl)
-                    status.append(False)
-                    continue
-            else:
-                if verbose: print("Overwriting file %s ..."%fl)
-            if verbose: print("Fetching file: %s"%fl)
+            if overwrite:
+                if verbose:
+                    print(f"Overwriting file {fl} ...")
+            elif os.path.isfile(fl):
+                if verbose:
+                    print(
+                        f"A file named {fl} already exists in the specified directory ... skipping download."
+                    )
+                status.append(False)
+                continue
+            if verbose:
+                print(f"Fetching file: {fl}")
             #-Get file in OS agnostic way using requests-#
             url = "/".join([repo, raw, branch, folder, fl])
             r = requests.get(url)

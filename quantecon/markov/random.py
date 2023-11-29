@@ -56,8 +56,7 @@ def random_markov_chain(n, k=None, sparse=False, random_state=None):
     """
     P = random_stochastic_matrix(n, k, sparse, format='csr',
                                  random_state=random_state)
-    mc = MarkovChain(P)
-    return mc
+    return MarkovChain(P)
 
 
 def random_stochastic_matrix(n, k=None, sparse=False, format='csr',
@@ -98,9 +97,9 @@ def random_stochastic_matrix(n, k=None, sparse=False, format='csr',
     random_markov_chain : Return a random MarkovChain instance.
 
     """
-    P = _random_stochastic_matrix(m=n, n=n, k=k, sparse=sparse, format=format,
-                                  random_state=random_state)
-    return P
+    return _random_stochastic_matrix(
+        m=n, n=n, k=k, sparse=sparse, format=format, random_state=random_state
+    )
 
 
 def _random_stochastic_matrix(m, n, k=None, sparse=False, format='csr',
@@ -120,11 +119,7 @@ def _random_stochastic_matrix(m, n, k=None, sparse=False, format='csr',
 
     if k == n:
         P = probvecs
-        if sparse:
-            return scipy.sparse.coo_matrix(P).asformat(format)
-        else:
-            return P
-
+        return scipy.sparse.coo_matrix(P).asformat(format) if sparse else P
     # if k < n:
     rows = np.repeat(np.arange(m), k)
     cols = \
@@ -209,5 +204,4 @@ def random_discrete_dp(num_states, num_actions, beta=None,
         R.shape = (num_states, num_actions)
         Q.shape = (num_states, num_actions, num_states)
 
-    ddp = DiscreteDP(R, Q, beta, s_indices, a_indices)
-    return ddp
+    return DiscreteDP(R, Q, beta, s_indices, a_indices)

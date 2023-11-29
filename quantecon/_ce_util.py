@@ -68,18 +68,17 @@ def gridmake(*arrays):
     and Finance, MIT Press, 2002.
 
     """
-    if all([i.ndim == 1 for i in arrays]):
-        d = len(arrays)
-        if d == 2:
-            out = _gridmake2(*arrays)
-        else:
-            out = _gridmake2(arrays[0], arrays[1])
-            for arr in arrays[2:]:
-                out = _gridmake2(out, arr)
-
-        return out
-    else:
+    if any(i.ndim != 1 for i in arrays):
         raise NotImplementedError("Come back here")
+    d = len(arrays)
+    if d == 2:
+        out = _gridmake2(*arrays)
+    else:
+        out = _gridmake2(arrays[0], arrays[1])
+        for arr in arrays[2:]:
+            out = _gridmake2(out, arr)
+
+    return out
 
 
 def _gridmake2(x1, x2):

@@ -239,16 +239,12 @@ def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50,
 
     # Convert to float (don't use float(x0); this works also for complex x0)
     p0 = 1.0 * x0
-    funcalls = 0
     status = _ECONVERR
 
     # Secant method
-    if x0 >= 0:
-        p1 = x0 * (1 + 1e-4) + 1e-4
-    else:
-        p1 = x0 * (1 + 1e-4) - 1e-4
+    p1 = x0 * (1 + 1e-4) + 1e-4 if x0 >= 0 else x0 * (1 + 1e-4) - 1e-4
     q0 = func(p0, *args)
-    funcalls += 1
+    funcalls = 0 + 1
     q1 = func(p1, *args)
     funcalls += 1
     for itr in range(maxiter):

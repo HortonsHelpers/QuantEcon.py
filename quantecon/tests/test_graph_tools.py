@@ -313,5 +313,5 @@ class TestRandomTournamentGraph:
 def test_random_tournament_graph_seed():
     n = 7
     seed = 1234
-    graphs = [random_tournament_graph(n, random_state=seed) for i in range(2)]
+    graphs = [random_tournament_graph(n, random_state=seed) for _ in range(2)]
     assert_array_equal(*[g.csgraph.toarray() for g in graphs])
